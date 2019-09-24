@@ -1,0 +1,28 @@
+{
+  "name": "nodejs-setup",
+  "version": "1.0.0",
+  "description": "minimum nodeJS+babel7 setup ",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "NODE_ENV=development nodemon dist/index.bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:build": "webpack -w"
+  },
+  "author": "ME",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.6.0",
+    "@babel/node": "^7.6.1",
+    "@babel/preset-env": "^7.6.0",
+    "eslint": "^6.4.0",
+    "eslint-config-equimper": "^2.2.2",
+    "nodemon": "^1.19.2",
+    "webpack": "^4.40.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "babel-loader": "^8.0.6",
+    "express": "^4.17.1"
+  }
+}
