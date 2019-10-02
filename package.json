@@ -14,6 +14,7 @@
     "@babel/core": "^7.6.0",
     "@babel/node": "^7.6.1",
     "@babel/preset-env": "^7.6.0",
+    "babel-loader": "^8.0.6",
     "eslint": "^6.4.0",
     "eslint-config-equimper": "^2.2.2",
     "nodemon": "^1.19.2",
@@ -22,7 +23,6 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "babel-loader": "^8.0.6",
     "express": "^4.17.1"
   }
 }
