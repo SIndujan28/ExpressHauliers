@@ -1,11 +1,22 @@
 /* eslint-disable no-console */
-import express from 'express';
 
-const app = express();
+import './config/database';
 
+import apiRoutes from './modules';
+
+import middlewaresConfig from './config/middlewares';
+
+import { app, server } from './services/socket.service';
+
+middlewaresConfig(app);
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, err => {
+app.get('/', (req, res) => {
+  res.send('alo amigos');
+});
+
+apiRoutes(app);
+server.listen(PORT, err => {
   if (err) {
     throw err;
   } else {
