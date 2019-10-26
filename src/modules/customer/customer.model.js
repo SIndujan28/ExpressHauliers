@@ -53,6 +53,9 @@ const customerSchema = new Schema({
     required: [true, 'Address should be listed'],
 
   },
+  reset: {
+    type: Boolean,
+  },
   // post: [
   //   {
   //     type: Schema.Types.ObjectId,

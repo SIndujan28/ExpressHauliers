@@ -12,4 +12,16 @@ export default {
       userName: Joi.string().required(),
       address: Joi.string().required(),
     } },
+  forget: {
+    body: {
+      email: Joi.string().email().required(),
+    },
+  },
+
+  reset: {
+    body: {
+      token: Joi.string().required(),
+      password: Joi.string().min(6).required(),
+    },
+  },
 };

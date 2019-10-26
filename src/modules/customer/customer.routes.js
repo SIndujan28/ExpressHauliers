@@ -9,5 +9,6 @@ const routes = new Router();
 
 routes.post('/signup', validate(customerValidation.signup), customerController.Signup);
 routes.post('/login', authLocalCustomer, customerController.login);
-
+routes.post('/forget', validate(customerValidation.forget), customerController.forget);
+routes.post('/reset', validate(customerValidation.reset), customerController.resetPassword);
 export default routes;
