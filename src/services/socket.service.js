@@ -90,7 +90,7 @@ function redisOps(socket, roomId, amt, userId) {
   promise.then((res) => {
     if (amt >= res && res !== null) {
       console.log(res);
-      socket.emit('dump_move', 'cant enter higher than last time');
+      socket.emit('dump_move', `cant enter higher than ${res} time`);
       return;
     } else if (res == null) {
       redis.zadd(roomId, amt, userId);
@@ -101,6 +101,7 @@ function redisOps(socket, roomId, amt, userId) {
     redis.zadd(roomId, amt, userId);
     nsp.in(socket.room_id).emit('final', { user_id: userId, amount: amt });
   });
+  nsp.in(socket.room_id).emit('final-min', redis.zrevrange(roomId, 0, 1, 'WITHSCORES'));
 }
 
 export { app, server, nsp };
