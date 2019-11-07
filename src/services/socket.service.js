@@ -86,22 +86,24 @@ nsp.on('connection', (socket) => {
 //   });
 // }
 function redisOps(socket, roomId, amt, userId) {
-  const promise = redis.zscore(roomId, userId);
+  const promise = redis.zrange(roomId, 0, 0, 'WITHSCORES');
   promise.then((res) => {
-    if (amt >= res && res !== null) {
-      console.log(res);
-      socket.emit('dump_move', `cant enter higher than ${res} time`);
-      return;
-    } else if (res == null) {
+    if (Array.isArray(res) && res.length > 0) {
+      console.log(`=====**${res[0]}****${res[1]}......${amt}`);
+      if (amt >= res[1] && amt > 100) {
+        console.log(`******${res}`);
+        socket.emit('dump_move', `cant enter higher than ${res[1]} `);
+        return;
+      }
+      console.log('im here');
+      redis.zadd(roomId, amt, userId);
+      nsp.in(socket.room_id).emit('final', { userId, amt });
+    } else {
       redis.zadd(roomId, amt, userId);
       nsp.in(socket.room_id).emit('final', { userId, amt });
     }
-  },
-  () => {
-    redis.zadd(roomId, amt, userId);
-    nsp.in(socket.room_id).emit('final', { user_id: userId, amount: amt });
   });
-  nsp.in(socket.room_id).emit('final-min', redis.zrevrange(roomId, 0, 1, 'WITHSCORES'));
+  // nsp.in(socket.room_id).emit('final', redis.zrange(roomId, 0, 0, 'WITHSCORES'));
 }
 
 export { app, server, nsp };
