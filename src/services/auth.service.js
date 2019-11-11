@@ -8,6 +8,7 @@ import constants from './../config/constants';
 
 import Customer from '../modules/customer/customer.model';
 import Transporter from '../modules/transporter/transporter.model';
+import User from './../modules/user/user.model';
 
 const LocalOpts = {
   usernameField: 'email',
@@ -15,11 +16,11 @@ const LocalOpts = {
 
 const customerLocalStrategy = new LocalStrategy(LocalOpts, async (email, password, done) => {
   try {
-    const user = await Customer.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return done(null, false);
-    } else if (!user.authenticateCustomer(password)) {
+    } else if (!user.authenticateUser(password)) {
       return done(null, false);
     }
     return done(null, user);

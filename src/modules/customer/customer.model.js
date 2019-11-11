@@ -51,7 +51,6 @@ const customerSchema = new Schema({
     type: String,
     trim: true,
     required: [true, 'Address should be listed'],
-
   },
   reset: {
     type: Boolean,
