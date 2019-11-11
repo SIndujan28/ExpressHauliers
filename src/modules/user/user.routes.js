@@ -4,7 +4,6 @@ import { authLocalCustomer, authFacebook, authGoogle, authTwitter } from './../.
 
 const routes = new Router();
 
-routes.get('/', (req, res) => res.send('ollla amigos'));
 routes.post('/signup', userController.Signup);
 routes.post('/login', authLocalCustomer, userController.login);
 routes.get('/oauth/google', authGoogle);

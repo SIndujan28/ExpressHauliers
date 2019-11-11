@@ -67,7 +67,7 @@ const googleTokenStartegy = new GoogleStrategy({
   callbackURL: '/api/v1/customer/oauth/google/redirect',
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    const customer = await Customer.findOne({ email: profile.emails[0].value });
+    const customer = await User.findOne({ email: profile.emails[0].value });
     if (!customer) {
       return done(null, { isNewUser: true, profile });
     }

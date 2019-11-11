@@ -39,9 +39,11 @@ export async function googleOAuth(req, res) {
       const user = await User.create({
         email: profile.emails[0].value,
         userName: profile.displayName,
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
         type: 'google',
+        metadata: {
+          firstName: profile.name.givenName,
+          lastName: profile.name.familyName,
+        },
       });
       return res.status(HTTPStatus.CREATED).send(user.toAuthJSON());
     }
@@ -59,9 +61,11 @@ export async function twitterOAuth(req, res) {
       const user = await User.create({
         email: profile.emails[0].value,
         userName: profile.displayName,
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
         type: 'twitter',
+        metadata: {
+          firstName: profile.name.givenName,
+          lastName: profile.name.familyName,
+        },
       });
       return res.status(HTTPStatus.CREATED).send(user.toAuthJSON());
     }
@@ -79,9 +83,11 @@ export async function facebookOAuth(req, res) {
       const user = await User.create({
         email: profile.emails[0].value,
         userName: profile.displayName,
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
         type: 'facebook',
+        metadata: {
+          firstName: profile.name.givenName,
+          lastName: profile.name.familyName,
+        },
       });
       return res.status(HTTPStatus.CREATED).send(user.toAuthJSON());
     }
@@ -93,13 +99,13 @@ export async function facebookOAuth(req, res) {
 export async function forget(req, res) {
   try {
     const email = req.body.email;
-    const customer = await User.findOne({ email });
-    if (!customer) {
+    const user = await User.findOne({ email });
+    if (!user) {
       return res.status(HTTPStatus.BAD_REQUEST).json('user doent exists signup first');
     }
-    const rememberToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), email: customer.email }, constants.PASSWORD_RESET_JWT);
-    await User.findByIdAndUpdate(customer._id, { reset: true });
-    sendFPEmail(customer.email, rememberToken);
+    const rememberToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), email: user.email }, constants.PASSWORD_RESET_JWT);
+    await User.findByIdAndUpdate(user._id, { reset: true });
+    sendFPEmail(user.email, rememberToken);
     return res.status(HTTPStatus.OK).json('email has sent');
   } catch (e) {
     return res.status(HTTPStatus.BAD_REQUEST).json(e);
@@ -110,8 +116,8 @@ export async function resetPassword(req, res) {
   const password = req.body.password;
   try {
     const token = jwt.verify(rememberToken, constants.PASSWORD_RESET_JWT);
-    const customer = await User.findOne({ email: token.email, reset: true });
-    if (!customer) {
+    const user = await User.findOne({ email: token.email, reset: true });
+    if (!user) {
       return res.status(HTTPStatus.NOT_ACCEPTABLE).json('lease try again, password token expired');
     }
     await User.update({ email: token.email }, { password: hashSync(password), reset: false });
