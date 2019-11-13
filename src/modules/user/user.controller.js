@@ -1,10 +1,17 @@
 import HTTPStatus from 'http-status';
 import jwt from 'jsonwebtoken';
 import { hashSync } from 'bcrypt-nodejs';
+import AWS from 'aws-sdk';
+import uuid from 'uuid';
 import User from './user.model';
 import constants from '../../config/constants';
 import sendFPEmail from './../../helpers/email.send.helper';
 
+AWS.config.update({
+  accessKeyId: constants.AWS_KEY_ID,
+  secretAccessKey: constants.AWS_ACCESS_KEY,
+});
+const s3 = new AWS.S3();
 export async function Signup(req, res) {
   try {
     const profile = req.body;
@@ -31,6 +38,31 @@ export async function login(req, res, next) {
   }
 }
 
+export async function uploadPhoto(req, res) {
+  try {
+    const file = req.files.photo;
+    console.log(file.data);
+    const filename = `${uuid()}.${file.mimetype.split('/')[1]}`;
+    const params = {
+      Bucket: constants.S3_BUCKET_NAME,
+      Key: `${constants.S3_USER_PROFILE_PATH}/${filename}`,
+      Body: file.data,
+    };
+    const s3upload = await new Promise(((resolve, reject) => {
+      s3.putObject(params, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
+      });
+    }));
+    const user = await User.findOneAndUpdate({ _id: req.user._id }, { profileImage: filename });
+    return res.status(HTTPStatus.CREATED).send({
+      profileImage: `${constants.S3_USER_URL}/${filename}`,
+      user,
+    });
+  } catch (e) {
+    return res.status(HTTPStatus.BAD_REQUEST).json(e);
+  }
+}
 export async function googleOAuth(req, res) {
   try {
     if (req.user.isNewUser) {

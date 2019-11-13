@@ -29,6 +29,14 @@ const userSchema = new Schema({
     ],
     default: 'local',
   },
+  profileImage: {
+    type: String,
+    default: 'profile.png',
+  },
+  profileImageVersion: {
+    type: Number,
+    default: 0,
+  },
   userName: {
     type: String,
     trim: true,
