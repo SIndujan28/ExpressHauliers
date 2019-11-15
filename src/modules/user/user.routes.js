@@ -12,7 +12,7 @@ routes.post('/forget', validate(userValidation.forget), userController.forget);
 routes.post('/reset', validate(userValidation.reset), userController.resetPassword);
 routes.post('/upload', authJwt, userController.uploadPhoto);
 routes.get('/oauth/google', (req, res, next) => {
-  req.app.locals.role = req.params.role;
+  req.app.locals.role = req.query.role;
   next();
 }, authGoogle);
 routes.get('/oauth/google/redirect', authGoogle, userController.googleOAuth);

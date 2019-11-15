@@ -10,5 +10,6 @@ routes.post('/', authJwt, validate(postValidation.createPost), postController.cr
 routes.get('/:id', authJwt, postController.getPostById);
 routes.get('/', authJwt, postController.getPostsList);
 routes.post('/toggle/:id', authJwt, postController.toggle);
+routes.post('/:id/image/upload', authJwt, postController.imageUpload);
 
 export default routes;

@@ -105,8 +105,8 @@ export async function googleOAuth(req, res) {
       const googleDP = profile._json.picture;
       const fileName = `${uuid()}.jpeg`;
       await download({ type: 'google', value: googleDP }, fileName, constants.FILE_UPLOAD_PATH);
-      const user = User.create({
-        email: profile.email,
+      const user = await User.create({
+        email: profile.emails[0].value,
         userName: profile.displayName,
         role,
         type: 'google',

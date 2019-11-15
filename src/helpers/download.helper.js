@@ -44,17 +44,16 @@ export default async function download(obj, fileName, pathToDownload) {
 }
 
 async function upload(location, fileName) {
+  const readStream = fs.createReadStream(location);
   const params = {
     Bucket: constants.S3_BUCKET_NAME,
     Key: `${constants.S3_USER_PROFILE_PATH}/${fileName}`,
+    Body: readStream,
   };
-
-  await new Promise((resolve, reject) => {
-    const body = fs.createReadStream(location);
-    const s3obj = s3({ params });
-    return s3obj.upload({ Body: body }).send((err, data) => {
-      if (err) reject(err);
-      if (data) resolve(data);
+  return new Promise((resolve, reject) => {
+    s3.upload(params, (err, data) => {
+      if (err) reject(err.stack());
+      else resolve(data);
     });
   });
 }

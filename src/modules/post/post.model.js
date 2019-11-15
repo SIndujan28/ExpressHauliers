@@ -22,9 +22,13 @@ const PostSchema = new Schema({
     trim: true,
     maxlength: [40, 'Describe breifly not more than 40 characters'],
   },
+  image: {
+    type: String,
+    default: 'image.png',
+  },
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'Customer',
+    ref: 'User',
 
   },
   status: {
@@ -68,7 +72,7 @@ PostSchema.statics = {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('customer');
+      .populate('user');
   },
 };
 

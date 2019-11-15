@@ -64,12 +64,11 @@ const jwtStrategy = new JWTStrategy(jwtOpts, async (payload, done) => {
 const googleTokenStartegy = new GoogleStrategy({
   clientID: constants.GOOGLE_ID,
   clientSecret: constants.GOOGLE_SECRET,
-  callbackURL: '/api/v1/customer/oauth/google/redirect',
+  callbackURL: '/api/v2/user/oauth/google/redirect',
   passReqToCallback: true,
 }, async (request, accessToken, refreshToken, profile, done) => {
   try {
     const role = request.app.locals.role;
-    console.log(request.app.locals.role);
     const customer = await User.findOne({ email: profile.emails[0].value });
     if (!customer) {
       return done(null, { isNewUser: true, profile, role });
