@@ -106,4 +106,4 @@ function redisOps(socket, roomId, amt, userId) {
   // nsp.in(socket.room_id).emit('final', redis.zrange(roomId, 0, 0, 'WITHSCORES'));
 }
 
-export { app, server, nsp };
+export { app, server, nsp, redis };

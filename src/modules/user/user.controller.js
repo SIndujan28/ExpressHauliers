@@ -91,7 +91,6 @@ export async function uploadPhoto(req, res) {
     const user = await User.findOneAndUpdate({ _id: userId }, { profileImage: filename, $inc: { profileImageVersion: 1 } });
     return res.status(HTTPStatus.CREATED).send({
       profileImage: `${constants.S3_USER_URL}/${filename}`,
-      user,
     });
   } catch (e) {
     return res.status(HTTPStatus.BAD_REQUEST).json(e);

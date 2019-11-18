@@ -43,6 +43,14 @@ const PostSchema = new Schema({
     ],
     default: 'awaiting_to_verify',
   },
+  transporter: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  finalAmount: {
+    type: String,
+    default: 'User yet to be assigned',
+  },
 }, { timestamps: true });
 
 PostSchema.methods = {
@@ -56,6 +64,7 @@ PostSchema.methods = {
       status: this.status,
       createdAt: this.createdAt,
       user: this.user,
+      image: this.image,
     };
   },
 };
