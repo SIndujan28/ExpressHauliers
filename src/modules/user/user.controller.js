@@ -43,7 +43,6 @@ export async function uploadPhoto(req, res) {
   try {
     const file = req.files.photo;
     const userId = req.user._id;
-    const currentVersion = req.user.profileImageVersion;
     const oldProfileImage = req.user.profileImage;
 
     if (file.mimetype !== 'image/jpg' && file.mimetype !== 'image/png') {

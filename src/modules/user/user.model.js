@@ -103,7 +103,6 @@ userSchema.methods = {
       _id: this._id,
       userName: this.userName,
       password: this.metadata.password,
-
     };
   },
 

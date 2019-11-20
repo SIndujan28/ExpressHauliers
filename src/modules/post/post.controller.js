@@ -23,7 +23,7 @@ export async function createPost(req, res) {
 }
 export async function getPostById(req, res) {
   try {
-    const post = await Post.findById(req.params.id).populate('user');
+    const post = await Post.findById(req.params.id).populate('user', '_id userName');
 
     return res.status(HTTPStatus.OK).json(post);
   } catch (e) {
@@ -45,7 +45,6 @@ export async function getPostsList(req, res) {
 export async function imageUpload(req, res) {
   try {
     const post = await Post.findById(req.params.id).populate('user');
-    console.log(typeof (req.user._id), typeof (post.user._id));
     if (JSON.stringify(req.user._id) === JSON.stringify(post.user._id)) {
       const file = req.files.photo;
       if (file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/png') {

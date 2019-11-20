@@ -1,2 +1,4 @@
 node_modules/
 dist/
+modules/customer/
+modules/transporter/

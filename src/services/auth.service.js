@@ -45,7 +45,7 @@ const transporterLocalStrategy = new LocalStrategy(LocalOpts, async (email, pass
 });
 const jwtOpts = {
 
-  jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken('authorization'),
   secretOrKey: constants.JWT_SECRET,
 };
 
