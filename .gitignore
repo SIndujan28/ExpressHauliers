@@ -1,5 +1,5 @@
 node_modules/
-dist/
 src/modules/customer/
 src/modules/transporter/
 src/config/constants.js
+dist
