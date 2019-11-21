@@ -14,7 +14,4 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: sindu
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: expresshauliers
-    restart: always
-    volumes:
-      - ./data/mongo/001_users.js:/docker-entrypoint-initdb.d/001_users.js:ro
+
