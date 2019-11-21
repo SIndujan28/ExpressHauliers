@@ -1,4 +1,5 @@
 node_modules/
 dist/
-modules/customer/
-modules/transporter/
+src/modules/customer/
+src/modules/transporter/
+src/config/constants.js
