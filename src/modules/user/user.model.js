@@ -1,8 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { compareSync, hashSync } from 'bcrypt-nodejs';
 import jwt from 'jsonwebtoken';
-import constants from './../../config/constants'
-;
 
 const userSchema = new Schema({
   email: {
@@ -87,7 +85,7 @@ userSchema.methods = {
     return jwt.sign({
       _id: this._id,
       role: this.role,
-    }, constants.JWT_SECRET);
+    }, process.env.JWT_SECRET);
   },
   toAuthJSON() {
     return {

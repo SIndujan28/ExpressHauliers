@@ -4,13 +4,12 @@ import { hashSync } from 'bcrypt-nodejs';
 import AWS from 'aws-sdk';
 import uuid from 'uuid';
 import User from './user.model';
-import constants from '../../config/constants';
 import sendFPEmail from './../../helpers/email.send.helper';
 import download from '../../helpers/download.helper';
 
 AWS.config.update({
-  accessKeyId: constants.AWS_KEY_ID,
-  secretAccessKey: constants.AWS_ACCESS_KEY,
+  accessKeyId: process.env.AWS_KEY_ID,
+  secretAccessKey: process.env.AWS_ACCESS_KEY,
 });
 const s3 = new AWS.S3();
 export async function Signup(req, res) {
@@ -51,19 +50,19 @@ export async function uploadPhoto(req, res) {
         message: 'Please upload .png or .jpg file',
       });
     }
-    if (file.data.byteLength / 1024 > constants.MAX_FILE_SIZE) {
+    if (file.data.byteLength / 1024 > process.env.MAX_FILE_SIZE) {
       return res.status(HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS).json({
         error: 'file_size_exceeded',
-        message: '`The image size exceeds the allowed limit, please upload a file below ${constants.MAX_FILE_SIZE / 1024}MB`',
+        message: '`The image size exceeds the allowed limit, please upload a file below ${process.env.MAX_FILE_SIZE / 1024}MB`',
       });
     }
 
     const parmasDelete = {
-      Bucket: constants.S3_BUCKET_NAME,
+      Bucket: process.env.S3_BUCKET_NAME,
       Delete: {
         Objects: [
           {
-            Key: `${constants.S3_USER_PROFILE_PATH}/${oldProfileImage}`,
+            Key: `${process.env.S3_USER_PROFILE_PATH}/${oldProfileImage}`,
           },
         ],
       },
@@ -77,9 +76,10 @@ export async function uploadPhoto(req, res) {
     }));
     const filename = `${uuid()}.${file.mimetype.split('/')[1]}`;
     const params = {
-      Bucket: constants.S3_BUCKET_NAME,
-      Key: `${constants.S3_USER_PROFILE_PATH}/${filename}`,
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: `${process.env.S3_USER_PROFILE_PATH}/${filename}`,
       Body: file.data,
+
     };
     const s3upload = await new Promise(((resolve, reject) => {
       s3.putObject(params, (err, data) => {
@@ -89,7 +89,7 @@ export async function uploadPhoto(req, res) {
     }));
     const user = await User.findOneAndUpdate({ _id: userId }, { profileImage: filename, $inc: { profileImageVersion: 1 } });
     return res.status(HTTPStatus.CREATED).send({
-      profileImage: `${constants.S3_USER_URL}/${filename}`,
+      profileImage: `${process.env.S3_USER_URL}/${filename}`,
     });
   } catch (e) {
     return res.status(HTTPStatus.BAD_REQUEST).json(e);
@@ -102,7 +102,7 @@ export async function googleOAuth(req, res) {
       const profile = req.user.profile;
       const googleDP = profile._json.picture;
       const fileName = `${uuid()}.jpeg`;
-      await download({ type: 'google', value: googleDP }, fileName, constants.FILE_UPLOAD_PATH);
+      await download({ type: 'google', value: googleDP }, fileName, process.env.FILE_UPLOAD_PATH);
       const user = await User.create({
         email: profile.emails[0].value,
         userName: profile.displayName,
@@ -129,7 +129,7 @@ export async function twitterOAuth(req, res) {
       const role = req.user.role;
       const twitterDP = profile._json.profile_image_url_https.replace('_normal', '');
       const fileName = `${uuid()}.jpeg`;
-      await download({ type: 'default', value: twitterDP }, fileName, constants.FILE_UPLOAD_PATH);
+      await download({ type: 'default', value: twitterDP }, fileName, process.env.FILE_UPLOAD_PATH);
       const user = await User.create({
         email: profile.email,
         role,
@@ -157,7 +157,7 @@ export async function facebookOAuth(req, res) {
       // const facebookDP = profile.photos[0].value;
       const profileId = profile.id;
       const fileName = `${uuid()}.jpeg`;
-      await download({ type: 'facebook', value: profileId, access_token: req.user.access_token }, fileName, constants.FILE_UPLOAD_PATH);
+      await download({ type: 'facebook', value: profileId, access_token: req.user.access_token }, fileName, process.env.FILE_UPLOAD_PATH);
       const user = await User.create({
         email: profile.email,
         role,
@@ -184,7 +184,7 @@ export async function forget(req, res) {
     if (!user) {
       return res.status(HTTPStatus.BAD_REQUEST).json('user doesn\'t exist signup first');
     }
-    const rememberToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), email: user.email }, constants.PASSWORD_RESET_JWT);
+    const rememberToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), email: user.email }, process.env.PASSWORD_RESET_JWT);
     await User.findByIdAndUpdate(user._id, { reset: true });
     sendFPEmail(user.email, rememberToken);
     res.status(HTTPStatus.OK).json('email has been sent');
@@ -197,7 +197,7 @@ export async function resetPassword(req, res) {
   const rememberToken = req.body.token;
   const password = req.body.password;
   try {
-    const token = jwt.verify(rememberToken, constants.PASSWORD_RESET_JWT);
+    const token = jwt.verify(rememberToken, process.env.PASSWORD_RESET_JWT);
     const user = await User.findOne({ email: token.email, reset: true });
     if (!user) {
       return res.status(HTTPStatus.BAD_REQUEST).json('please try again!!!');

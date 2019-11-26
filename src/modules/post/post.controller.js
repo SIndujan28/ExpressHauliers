@@ -4,11 +4,10 @@ import uuid from 'uuid';
 import Post from './post.model';
 
 import { nsp, redis } from './../../services/socket.service';
-import constants from './../../config/constants';
 
 AWS.config.update({
-  accessKeyId: constants.AWS_KEY_ID,
-  secretAccessKey: constants.AWS_ACCESS_KEY,
+  accessKeyId: process.env.AWS_KEY_ID,
+  secretAccessKey: process.env.AWS_ACCESS_KEY,
   region: 'ap-southeast-1',
 });
 const s3 = new AWS.S3();
@@ -53,16 +52,16 @@ export async function imageUpload(req, res) {
           message: 'Please upload .png or .jpg file',
         });
       }
-      if (file.data.byteLength / 1024 > constants.MAX_FILE_SIZE) {
+      if (file.data.byteLength / 1024 > process.env.MAX_FILE_SIZE) {
         return res.status(HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS).json({
           error: 'file_size_exceeded',
-          message: '`The image size exceeds the allowed limit, please upload a file below ${constants.MAX_FILE_SIZE / 1024}MB`',
+          message: '`The image size exceeds the allowed limit, please upload a file below ${process.env.MAX_FILE_SIZE / 1024}MB`',
         });
       }
       const filename = `${uuid()}.${file.mimetype.split('/')[1]}`;
       const params = {
-        Bucket: constants.S3_BUCKET_NAME,
-        Key: `${constants.S3_POST_PATH}/${filename}`,
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: `${process.env.S3_POST_PATH}/${filename}`,
         Body: file.data,
       };
       const s3upload = await new Promise(((resolve, reject) => {
@@ -75,7 +74,7 @@ export async function imageUpload(req, res) {
       await post.updateOne({ image: filename });
 
       return res.status(HTTPStatus.CREATED).send({
-        image: `${constants.S3_POST_URL}/${filename}`,
+        image: `${process.env.S3_POST_URL}/${filename}`,
       });
     }
 
@@ -102,12 +101,11 @@ export async function toggle(req, res) {
         const post = await Post.findByIdAndUpdate(req.params.id, {
           status: status1,
         }, { new: true });
-        console.log(`${constants.S3_POST_PATH}/${post.image}`);
         const params = {
           Image: {
             S3Object: {
-              Bucket: constants.S3_BUCKET_NAME,
-              Name: `${constants.S3_POST_PATH}/${post.image}`,
+              Bucket: process.env.S3_BUCKET_NAME,
+              Name: `${process.env.S3_POST_PATH}/${post.image}`,
             },
           },
         };

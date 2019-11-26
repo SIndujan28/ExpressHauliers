@@ -4,10 +4,7 @@ import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
-import constants from './../config/constants';
 
-import Customer from '../modules/customer/customer.model';
-import Transporter from '../modules/transporter/transporter.model';
 import User from './../modules/user/user.model';
 
 const LocalOpts = {
@@ -29,24 +26,10 @@ const customerLocalStrategy = new LocalStrategy(LocalOpts, async (email, passwor
   }
 });
 
-const transporterLocalStrategy = new LocalStrategy(LocalOpts, async (email, password, done) => {
-  try {
-    const user = await Transporter.findOne({ email });
-
-    if (!user) {
-      return done(null, false);
-    } else if (!user.authenticateTransporter(password)) {
-      return done(null, false);
-    }
-    return done(null, user);
-  } catch (e) {
-    return done(e, false);
-  }
-});
 const jwtOpts = {
 
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken('authorization'),
-  secretOrKey: constants.JWT_SECRET,
+  secretOrKey: process.env.JWT_SECRET,
 };
 
 const jwtStrategy = new JWTStrategy(jwtOpts, async (payload, done) => {
@@ -62,8 +45,8 @@ const jwtStrategy = new JWTStrategy(jwtOpts, async (payload, done) => {
 });
 
 const googleTokenStartegy = new GoogleStrategy({
-  clientID: constants.GOOGLE_ID,
-  clientSecret: constants.GOOGLE_SECRET,
+  clientID: process.env.GOOGLE_ID,
+  clientSecret: process.env.GOOGLE_SECRET,
   callbackURL: '/api/v2/user/oauth/google/redirect',
   passReqToCallback: true,
 }, async (request, accessToken, refreshToken, profile, done) => {
@@ -80,8 +63,8 @@ const googleTokenStartegy = new GoogleStrategy({
 });
 
 const twitterTokenStrategy = new TwitterStrategy({
-  consumerKey: constants.TWITTER_ID,
-  consumerSecret: constants.TWITTER_SECRET,
+  consumerKey: process.env.TWITTER_ID,
+  consumerSecret: process.env.TWITTER_SECRET,
   callbackURL: '/api/v1/customer/oauth/twitter/redirect',
 }, async (token, tokenSecret, profile, done) => {
   try {
@@ -95,8 +78,8 @@ const twitterTokenStrategy = new TwitterStrategy({
   }
 });
 const facebookTokenStartegy = new FacebookStrategy({
-  clientID: constants.FACEBOOK_ID,
-  clientSecret: constants.FACEBOOK_SECRET,
+  clientID: process.env.FACEBOOK_ID,
+  clientSecret: process.env.FACEBOOK_SECRET,
   callbackURL: '/api/v1/customer/oauth/facebook/redirect',
 }, async (accessToken, refreshToken, profile, done) => {
   try {
@@ -113,10 +96,8 @@ passport.use('facebookToken', facebookTokenStartegy);
 passport.use('twitterToken', twitterTokenStrategy);
 passport.use('googleToken', googleTokenStartegy);
 passport.use('local.customer', customerLocalStrategy);
-passport.use('local.transporter', transporterLocalStrategy);
 passport.use(jwtStrategy);
 export const authLocalCustomer = passport.authenticate('local.customer', { session: false });
-export const authLocalTransporter = passport.authenticate('local.transporter', { session: false });
 export const authGoogle = passport.authenticate('googleToken', { scope: ['profile', 'email'], session: false });
 export const authTwitter = passport.authenticate('twitterToken', { session: false });
 export const authFacebook = passport.authenticate('facebookToken', { session: false });

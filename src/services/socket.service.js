@@ -3,22 +3,24 @@ import http from 'http';
 import socketIO from 'socket.io';
 import jwt from 'jsonwebtoken';
 import Redis from 'ioredis';
-import constants from './../config/constants';
+
 import Post from './../modules/post/post.model';
 
 const app = express();
 const server = http.Server(app);
 const io = socketIO(server);
 
-const redis = new Redis();
+const redis = new Redis({
+  password: 'foobared',
+});
 
 const nsp = io.of('/betting-room');
 
 nsp.use((socket, next) => {
   if (socket.handshake.query && socket.handshake.query.token) {
-    jwt.verify(socket.handshake.query.token, constants.JWT_SECRET, (err, decoded) => {
+    jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) return next(new Error('Unauthorized'));
-      if (decoded.role !== constants.TRANSPORTER_KEY) return next(new Error('Unauthorized'));
+      if (decoded.role !== process.env.TRANSPORTER_KEY) return next(new Error('Unauthorized'));
       socket.user_id = decoded._id;
       next();
     });
