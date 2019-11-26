@@ -3,3 +3,4 @@ src/modules/customer/
 src/modules/transporter/
 src/config/constants.js
 dist
+.env
