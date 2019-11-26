@@ -1,20 +1,20 @@
 /* eslint-disable no-console*/
 
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-import constants from './constants';
-
+dotenv.config();
 mongoose.Promise = global.Promise;
 
 try {
-  mongoose.connect(constants.MONGO_URL, {
+  mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
   });
   mongoose.set('useCreateIndex', true);
 } catch (error) {
-  mongoose.createConnection(constants.MONGO_URL);
+  mongoose.createConnection(process.env.MONGO_URL);
 }
 
 mongoose.connection
